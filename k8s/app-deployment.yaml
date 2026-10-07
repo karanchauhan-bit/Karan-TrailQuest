@@ -60,15 +60,15 @@ spec:
 
           env:
 
-            - name: DB_PASSWORD
+            - name: MONGO_URI
 
               valueFrom:
 
                 secretKeyRef:
 
-                  name: karan-mysql-secret
+                  name: karan-mongodb-secret
 
-                  key: MYSQL_PASSWORD
+                  key: MONGO_URI
 
           readinessProbe:
 
