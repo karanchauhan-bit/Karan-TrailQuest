@@ -1,19 +1,10 @@
 apiVersion: v1
-
 kind: ConfigMap
-
 metadata:
-
-  name: karan-dashboard-config
-
-  namespace: karan-dashboard
-
+  name: karan-trailquest-config
+  namespace: karan-trailquest
 data:
-
-  APP_NAME: "Karan DevOps Dashboard"
-
+  APP_NAME: "Karan TrailQuest"
   APP_VERSION: "3.0.0"
-
   ENVIRONMENT: "kubernetes"
-
-  MONGO_DB_NAME: "karan_dashboard"
+  MONGO_DB_NAME: "karan_trailquest"
