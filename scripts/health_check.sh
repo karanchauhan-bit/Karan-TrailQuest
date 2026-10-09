@@ -1,157 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+APP_URL="${APP_URL:-http://127.0.0.1:5000/health}"
+MAX_ATTEMPTS="${MAX_ATTEMPTS:-10}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-3}"
 
-NAMESPACE="${K8S_NAMESPACE:-karan-dashboard}"
-SERVICE_NAME="karan-devops-dashboard-service"
-
-LOCAL_PORT="5050"
-SERVICE_PORT="5000"
-
-APP_URL="http://localhost:${LOCAL_PORT}/health"
-
-PORT_FORWARD_LOG="${WORKSPACE:-/tmp}/karan-health-port-forward.log"
-
-echo "=========================================="
-echo "Karan DevOps Dashboard Health Check"
-echo "=========================================="
-
-echo
-echo "Namespace:    $NAMESPACE"
-echo "Service:      $SERVICE_NAME"
-echo "Local Port:   $LOCAL_PORT"
-echo "Service Port: $SERVICE_PORT"
-echo
-
-echo "1. Checking Kubernetes pods..."
-
-kubectl get pods \
-    -n "$NAMESPACE"
-
-echo
-
-echo "2. Checking Kubernetes service..."
-
-kubectl get svc \
-    "$SERVICE_NAME" \
-    -n "$NAMESPACE"
-
-echo
-
-echo "3. Stopping existing port-forward if running..."
-
-pkill -f "kubectl port-forward.*${SERVICE_NAME}" || true
-
-sleep 2
-
-echo
-
-echo "4. Starting Kubernetes port-forward..."
-
-JENKINS_NODE_COOKIE=dontKillMe \
-nohup kubectl port-forward \
-    --address 0.0.0.0 \
-    "svc/${SERVICE_NAME}" \
-    "${LOCAL_PORT}:${SERVICE_PORT}" \
-    -n "$NAMESPACE" \
-    > "$PORT_FORWARD_LOG" 2>&1 &
-
-PORT_FORWARD_PID=$!
-
-echo "Port-forward PID: $PORT_FORWARD_PID"
-
-echo
-
-echo "5. Waiting for application..."
-
-HEALTH_CHECK_PASSED=false
-
-for i in {1..15}
-do
-
-    if curl -sf "$APP_URL" \
-        > /tmp/karan-health-response.json
-    then
-
-        HEALTH_CHECK_PASSED=true
-
-        echo
-        echo "Health check passed."
-
-        echo
-        cat /tmp/karan-health-response.json
-
-        break
-    fi
-
-    echo "Attempt $i/15 failed. Waiting 2 seconds..."
-
-    sleep 2
-
+for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+  echo "Health check attempt ${attempt}/${MAX_ATTEMPTS}: ${APP_URL}"
+  if curl --fail --silent --show-error "$APP_URL"; then
+    echo
+    echo "Health check passed."
+    exit 0
+  fi
+  sleep "$SLEEP_SECONDS"
 done
 
-
-if [ "$HEALTH_CHECK_PASSED" = false ]; then
-
-    echo
-    echo "=========================================="
-    echo "Health check FAILED."
-    echo "=========================================="
-
-    echo
-    echo "Port-forward log:"
-
-    cat "$PORT_FORWARD_LOG" || true
-
-    echo
-    echo "Kubernetes pods:"
-
-    kubectl get pods \
-        -n "$NAMESPACE" \
-        -o wide \
-        || true
-
-    echo
-    echo "Kubernetes service:"
-
-    kubectl get svc \
-        "$SERVICE_NAME" \
-        -n "$NAMESPACE" \
-        || true
-
-    echo
-    echo "Application pod details:"
-
-    kubectl describe pods \
-        -n "$NAMESPACE" \
-        -l app=karan-devops-dashboard \
-        || true
-
-    exit 1
-
-fi
-
-
-echo
-echo "=========================================="
-echo "Application is healthy."
-echo "=========================================="
-
-echo
-echo "Application URL:"
-echo "http://localhost:${LOCAL_PORT}"
-
-echo
-echo "Health URL:"
-echo "$APP_URL"
-
-echo
-echo "Port-forward PID:"
-echo "$PORT_FORWARD_PID"
-
-echo
-echo "Port-forward log:"
-echo "$PORT_FORWARD_LOG"
-
-echo
-echo "=========================================="
+echo "Health check failed after ${MAX_ATTEMPTS} attempts."
+exit 1
