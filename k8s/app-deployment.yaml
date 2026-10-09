@@ -1,117 +1,66 @@
 apiVersion: apps/v1
-
 kind: Deployment
-
 metadata:
-
-  name: karan-devops-dashboard
-
-  namespace: karan-dashboard
-
+  name: karan-trailquest-app
+  namespace: karan-trailquest
+  labels:
+    app: karan-trailquest
 spec:
-
   replicas: 2
-
   strategy:
-
     type: RollingUpdate
-
     rollingUpdate:
-
       maxUnavailable: 0
-
       maxSurge: 1
-
   selector:
-
     matchLabels:
-
-      app: karan-devops-dashboard
-
+      app: karan-trailquest
   template:
-
     metadata:
-
       labels:
-
-        app: karan-devops-dashboard
-
+        app: karan-trailquest
     spec:
-
       containers:
-
-        - name: app
-
+        - name: karan-trailquest
           image: IMAGE_REPOSITORY_PLACEHOLDER:IMAGE_TAG_PLACEHOLDER
-
-          imagePullPolicy: Always
-
+          imagePullPolicy: IfNotPresent
           ports:
-
-            - containerPort: 5000
-
-              protocol: TCP
-
+            - name: http
+              containerPort: 5000
           envFrom:
-
             - configMapRef:
-
-                name: karan-dashboard-config
-
+                name: karan-trailquest-config
           env:
-
             - name: MONGO_URI
-
               valueFrom:
-
                 secretKeyRef:
-
-                  name: karan-mongodb-secret
-
+                  name: karan-trailquest-secret
                   key: MONGO_URI
-
           readinessProbe:
-
             httpGet:
-
-              path: /health
-
-              port: 5000
-
-            initialDelaySeconds: 10
-
+              path: /ready
+              port: http
+            initialDelaySeconds: 8
             periodSeconds: 10
-
             timeoutSeconds: 5
-
             failureThreshold: 6
-
           livenessProbe:
-
             httpGet:
-
               path: /health
-
-              port: 5000
-
-            initialDelaySeconds: 30
-
+              port: http
+            initialDelaySeconds: 20
             periodSeconds: 20
-
             timeoutSeconds: 5
-
             failureThreshold: 3
-
           resources:
-
             requests:
-
-              cpu: 100m
-
-              memory: 128Mi
-
+              cpu: "100m"
+              memory: "128Mi"
             limits:
-
-              cpu: 500m
-
-              memory: 512Mi
+              cpu: "500m"
+              memory: "512Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
