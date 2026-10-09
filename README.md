@@ -1,202 +1,52 @@
-# Karan DevOps Dashboard
+# Karan TrailQuest
 
-A practical DevOps project using:
+Customer-facing adventure tour booking application built with Flask, MongoDB Atlas, Docker, Jenkins and Kubernetes.
 
-- Python
-- Flask
-- MySQL
-- HTML
-- CSS
-- JavaScript
-- Docker
-- Docker Compose
-- Git
-- GitHub
-- Jenkins
-- Docker Hub
-- Kubernetes
-- AWS EC2
+## Features
 
+- Responsive adventure travel interface
+- Destination cards with **Explore** modal
+- **Explore Destinations** smooth-scroll navigation
+- Booking form with client-side and server-side validation
+- Email format validation
+- Exactly 10-digit phone validation
+- Destination dropdown + custom destination option
+- Travelers dropdown + 6–30 custom group size
+- Past travel dates rejected
+- MongoDB Atlas booking storage
+- Docker / Docker Compose local workflow
+- Kubernetes Deployment + Service + NGINX Ingress
+- HPA: 2–5 replicas at 60% CPU target
+- Readiness and liveness probes
+- Jenkins CI/CD pipeline
+- Real Kubernetes secret excluded from Git
 
-## Project Flow
+## Booking data
 
-GitHub
-    |
-    v
-Jenkins
-    |
-    +--> Checkout
-    |
-    +--> Syntax Check
-    |
-    +--> Unit Tests
-    |
-    +--> Docker Build
-    |
-    +--> Docker Push
-    |
-    +--> Kubernetes Deploy
-    |
-    +--> Health Check
-            |
-            v
-       Kubernetes
-          |     |
-          v     v
-       Flask   MySQL
-       2 Pods   1 Pod
+MongoDB Atlas database:
 
+`karan_trailquest`
 
-## Local Docker Compose
+Collection:
 
-Start:
+`bookings`
 
-docker compose up -d --build
+## Local URL
 
+Direct Flask/Docker testing:
 
-Check:
+`http://127.0.0.1:5000`
 
-docker compose ps
+After local Kubernetes + NGINX Ingress setup:
 
+`http://trailquest.local`
 
-Application:
+## Important secret rule
 
-http://localhost:5000
+Never commit:
 
+`k8s/secret.yml`
 
-Health:
+Use `k8s/secret.example.yml` only as a template.
 
-curl http://localhost:5000/health
-
-
-Stop:
-
-docker compose down
-
-
-Remove database volume:
-
-docker compose down -v
-
-
-## Unit Tests
-
-python3 -m unittest discover -s tests -v
-
-
-## Kubernetes Namespace
-
-karan-dashboard
-
-
-## Kubernetes Application
-
-2 Flask replicas.
-
-
-## Kubernetes Database
-
-1 MySQL replica.
-
-
-## Application Service
-
-NodePort:
-
-30080
-
-
-## MySQL Service
-
-ClusterIP:
-
-3306
-
-
-## Jenkins Pipeline
-
-Checkout
-Syntax Check
-Unit Tests
-Docker Build
-Docker Push
-Kubernetes Deploy
-Health Check
-
-
-## Docker Image Tags
-
-Jenkins BUILD_NUMBER is used.
-
-Build #1:
-
-karan-devops-dashboard:1
-
-
-Build #2:
-
-karan-devops-dashboard:2
-
-
-Build #3:
-
-karan-devops-dashboard:3
-
-
-latest is also updated.
-
-
-## Repeated Jenkins Runs
-
-Kubernetes resources are updated using kubectl apply.
-
-The application Deployment uses RollingUpdate.
-
-Repeated pipeline runs do not create duplicate Deployments or Services.
-
-
-## Local Database
-
-DB_HOST=mysql
-
-
-## Kubernetes Database
-
-DB_HOST=karan-mysql-service
-
-
-## Kubernetes Storage
-
-PersistentVolume
-    |
-    v
-PersistentVolumeClaim
-    |
-    v
-MySQL
-
-
-## Useful Commands
-
-kubectl get all -n karan-dashboard
-
-kubectl get pods -n karan-dashboard
-
-kubectl get pvc -n karan-dashboard
-
-kubectl get svc -n karan-dashboard
-
-kubectl logs deployment/karan-devops-dashboard -n karan-dashboard
-
-
-## Port Forward
-
-kubectl port-forward \
-    service/karan-devops-dashboard-service \
-    5000:5000 \
-    -n karan-dashboard
-
-
-Then open:
-
-http://localhost:5000
+See `PROJECT_NOTEBOOK.md` for the local-first and EC2 deployment workflow.
