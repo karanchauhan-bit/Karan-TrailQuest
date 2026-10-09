@@ -1,395 +1,89 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Karan DevOps Dashboard"
-    >
-
-    <title>
-        {{ app_name }}
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for(
-            'static',
-            filename='css/style.css'
-        ) }}"
-    >
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Karan TrailQuest adventure travel booking platform">
+  <title>Karan TrailQuest — Explore Beyond Limits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="#home"><span class="brand-mark">▲</span><span>KARAN <strong>TRAILQUEST</strong></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">☰</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#home">Home</a><a href="#destinations">Destinations</a><a href="#about">About</a><a href="#contact">Contact</a>
+      </div>
+      <a class="button button-small" href="#booking">Plan Your Trip</a>
+    </nav>
+  </header>
 
-<header class="topbar">
-
-    <div class="brand">
-
-        <div class="brand-icon">
-            KD
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Adventure travel, made simple</p>
+          <h1>Explore Beyond <span>Limits</span></h1>
+          <p class="hero-text">Discover unforgettable destinations, choose your adventure and send your trip request in a few clicks.</p>
+          <a class="button" href="#destinations">Explore Destinations →</a>
         </div>
 
-        <div>
-
-            <h1>
-                {{ app_name }}
-            </h1>
-
-            <p>
-                DevOps Learning & Deployment Dashboard
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="environment-badge">
-        {{ environment }}
-    </div>
-
-</header>
-
-
-<main class="container">
-
-    <section class="hero">
-
-        <div>
-
-            <p class="eyebrow">
-                DEVOPS PROJECT
-            </p>
-
-            <h2>
-                Flask + MongoDB Atlas + Docker
-                + Jenkins + Kubernetes
-            </h2>
-
-            <p class="hero-text">
-
-                A practical DevOps dashboard demonstrating
-                Git, automated testing, Docker image creation,
-                Docker Hub publishing, Kubernetes deployment
-                and application health checks.
-
-            </p>
-
-            <button
-                id="healthButton"
-                class="primary-button"
-            >
-                Run Health Check
-            </button>
-
-            <p
-                id="healthMessage"
-                class="health-message"
-            >
-                Checking application health...
-            </p>
-
-        </div>
-
-        <div class="hero-card">
-
-            <span class="hero-card-label">
-                VERSION
-            </span>
-
-            <strong>
-                {{ version }}
-            </strong>
-
-            <span>
-                {{ environment }}
-            </span>
-
-        </div>
-
+        <section class="booking-card" id="booking">
+          <div class="booking-title-row"><span class="icon-circle">✈</span><div><p class="eyebrow">Start planning</p><h2>Plan Your Trip</h2></div></div>
+          <form id="booking-form" novalidate>
+            <div class="form-grid">
+              <label>Full Name<input type="text" name="name" minlength="2" maxlength="80" placeholder="Enter your name" required><small class="field-error" data-error-for="name"></small></label>
+              <label>Email Address<input type="email" name="email" placeholder="name@example.com" required><small class="field-error" data-error-for="email"></small></label>
+              <label>Phone Number<input type="tel" name="phone" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" required><small class="field-error" data-error-for="phone"></small></label>
+              <label>Destination<select name="destination" id="destination" required><option value="">Select Destination</option>{% for tour in tours %}<option value="{{ tour.name }}">{{ tour.name }}</option>{% endfor %}<option value="Other / Custom Destination">Other / Custom Destination</option></select><small class="field-error" data-error-for="destination"></small></label>
+              <label class="hidden-field" id="custom-destination-wrap">Custom Destination<input type="text" name="custom_destination" maxlength="60" placeholder="Where do you want to go?"><small class="field-error" data-error-for="custom_destination"></small></label>
+              <label>Travel Date<input type="date" name="travel_date" id="travel-date" required><small class="field-error" data-error-for="travel_date"></small></label>
+              <label>Number of Travelers<select id="travelers-choice" required><option value="">Select travelers</option><option value="1">1 Traveler</option><option value="2">2 Travelers</option><option value="3">3 Travelers</option><option value="4">4 Travelers</option><option value="5">5 Travelers</option><option value="6+">6+ Travelers</option></select><small class="field-error" data-error-for="travelers"></small></label>
+              <label class="hidden-field" id="group-size-wrap">Total Travelers<input type="number" id="group-size" min="6" max="30" placeholder="6 to 30"></label>
+              <label class="form-full">Message <span class="optional">(optional)</span><textarea name="message" maxlength="500" rows="3" placeholder="Tell us anything useful about your trip"></textarea><small class="field-error" data-error-for="message"></small></label>
+            </div>
+            <button class="button button-full" type="submit" id="submit-button">Book Your Adventure</button>
+            <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+          </form>
+        </section>
+      </div>
     </section>
 
-
-    <section class="stats-grid">
-
-        <article class="stat-card">
-
-            <span class="stat-label">
-                APPLICATION
-            </span>
-
-            <strong id="applicationStatus">
-                Checking...
-            </strong>
-
-            <span>
-                Flask + Gunicorn
-            </span>
-
-        </article>
-
-
-        <article class="stat-card">
-
-            <span class="stat-label">
-                DATABASE
-            </span>
-
-            <strong id="databaseStatus">
-                Checking...
-            </strong>
-
-            <span>
-                MongoDB Atlas
-            </span>
-
-        </article>
-
-
-        <article class="stat-card">
-
-            <span class="stat-label">
-                CONTAINER
-            </span>
-
-            <strong>
-                Docker
-            </strong>
-
-            <span>
-                Port 5000
-            </span>
-
-        </article>
-
-
-        <article class="stat-card">
-
-            <span class="stat-label">
-                ORCHESTRATION
-            </span>
-
-            <strong>
-                Kubernetes
-            </strong>
-
-            <span>
-                EC2 ready
-            </span>
-
-        </article>
-
-    </section>
-
-
-    <section class="content-grid">
-
-        <article class="panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        DATABASE
-                    </p>
-
-                    <h3>
-                        Skill Matrix
-                    </h3>
-
-                </div>
-
-                <span class="panel-status">
-                    MySQL
-                </span>
-
+    <section class="section" id="destinations">
+      <div class="container">
+        <div class="section-heading"><p class="eyebrow">Popular destinations</p><h2>Top Travel Destinations</h2><p>Pick a destination, explore its highlights, then book it directly.</p></div>
+        <div class="tour-grid">
+          {% for tour in tours %}
+          <article class="tour-card">
+            <img src="{{ tour.image }}" alt="{{ tour.name }}" loading="lazy">
+            <div class="tour-card-body">
+              <div class="tour-card-meta"><span>📍 {{ tour.state }}</span><span>{{ tour.duration }}</span></div>
+              <h3>{{ tour.name }}</h3><p>{{ tour.summary }}</p>
+              <div class="tour-card-footer"><strong>From {{ tour.price }}</strong><button class="link-button explore-button" type="button" data-tour='{{ tour | tojson }}'>Explore →</button></div>
             </div>
-
-            <div
-                id="skillsContainer"
-                class="skills-container"
-            >
-                Loading skills...
-            </div>
-
-        </article>
-
-
-        <article class="panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <p class="eyebrow">
-                        CI/CD
-                    </p>
-
-                    <h3>
-                        Jenkins Pipeline
-                    </h3>
-
-                </div>
-
-                <span class="panel-status">
-                    Automated
-                </span>
-
-            </div>
-
-            <div
-                id="pipelineList"
-                class="pipeline-list"
-            >
-                Loading pipeline...
-            </div>
-
-        </article>
-
-    </section>
-
-
-    <section class="panel system-panel">
-
-        <div class="panel-header">
-
-            <div>
-
-                <p class="eyebrow">
-                    RUNTIME
-                </p>
-
-                <h3>
-                    System Information
-                </h3>
-
-            </div>
-
+          </article>
+          {% endfor %}
         </div>
-
-        <div
-            id="systemInfo"
-            class="system-grid"
-        >
-
-            <div class="system-item">
-
-                <span>
-                    Hostname
-                </span>
-
-                <strong id="hostname">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="system-item">
-
-                <span>
-                    Platform
-                </span>
-
-                <strong id="platform">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="system-item">
-
-                <span>
-                    Python
-                </span>
-
-                <strong id="pythonVersion">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="system-item">
-
-                <span>
-                    Environment
-                </span>
-
-                <strong id="runtimeEnvironment">
-                    -
-                </strong>
-
-            </div>
-
-        </div>
-
+      </div>
     </section>
 
+    <section class="benefits" id="about"><div class="container benefit-grid">
+      <div><span>🌍</span><h3>Curated Destinations</h3><p>Adventure-focused itineraries across iconic Indian destinations.</p></div>
+      <div><span>🛡️</span><h3>Clear Planning</h3><p>Simple booking requests with clean validation and secure data handling.</p></div>
+      <div><span>🎧</span><h3>Travel Support</h3><p>Your request is captured so the travel team can follow up with details.</p></div>
+      <div><span>⭐</span><h3>Memorable Trips</h3><p>Experiences designed around landscapes, activities and local discovery.</p></div>
+    </div></section>
 
-    <section class="api-panel">
+    <section class="cta-section" id="contact"><div class="container cta-card"><div><p class="eyebrow">Ready for your next trail?</p><h2>Your adventure starts with one request.</h2></div><a class="button" href="#booking">Plan Your Trip</a></div></section>
+  </main>
 
-        <p class="eyebrow">
-            API ENDPOINTS
-        </p>
+  <footer class="site-footer"><div class="container footer-grid"><div class="brand footer-brand"><span class="brand-mark">▲</span><span>KARAN <strong>TRAILQUEST</strong></span></div><p>Explore Beyond Limits · App version {{ app_version }}</p><div class="footer-links"><a href="#home">Home</a><a href="#destinations">Destinations</a><a href="#booking">Booking</a></div></div></footer>
 
-        <div class="api-list">
-
-            <code>
-                GET /api/status
-            </code>
-
-            <code>
-                GET /api/skills
-            </code>
-
-            <code>
-                GET /api/pipeline
-            </code>
-
-            <code>
-                GET /health
-            </code>
-
-        </div>
-
-    </section>
-
-</main>
-
-
-<footer class="footer">
-
-    <p>
-        © {{ year }} Karan DevOps Dashboard
-    </p>
-
-    <p>
-        Built for practical DevOps learning
-    </p>
-
-</footer>
-
-
-<script
-    src="{{ url_for(
-        'static',
-        filename='js/app.js'
-    ) }}"
-></script>
-
+  <dialog class="tour-modal" id="tour-modal"><button class="modal-close" type="button" aria-label="Close">×</button><div id="tour-modal-content"></div></dialog>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </body>
-
 </html>
