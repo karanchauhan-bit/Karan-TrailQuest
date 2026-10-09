@@ -1,33 +1,58 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-NAMESPACE="${K8S_NAMESPACE:-karan-dashboard}"
-IMAGE_REPO="${IMAGE_REPO:-YOUR_DOCKERHUB_USERNAME/karan-devops-dashboard}"
+IMAGE_REPO="${IMAGE_REPO:-karan1989/karan-trailquest}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
-MONGO_URI="${MONGO_URI:-}"
+NAMESPACE="${K8S_NAMESPACE:-karan-trailquest}"
+DEPLOYMENT_NAME="karan-trailquest-app"
 
-echo "Deploying Karan DevOps Dashboard with MongoDB Atlas"
+required_files=(
+  k8s/namespace.yaml
+  k8s/configmap.yaml
+  k8s/secret.yml
+  k8s/app-service.yaml
+  k8s/app-deployment.yaml
+  k8s/ingress.yaml
+  k8s/hpa.yaml
+)
 
-if [[ "$IMAGE_REPO" == "YOUR_DOCKERHUB_USERNAME/"* ]]; then
-  echo "ERROR: Replace YOUR_DOCKERHUB_USERNAME."
-  exit 1
-fi
+command -v kubectl >/dev/null 2>&1 || { echo "ERROR: kubectl not found."; exit 1; }
 
-if [[ -z "$MONGO_URI" ]]; then
-  echo "ERROR: MONGO_URI is not configured."
-  exit 1
-fi
+for file in "${required_files[@]}"; do
+  [[ -f "$file" ]] || { echo "ERROR: required file not found: $file"; exit 1; }
+done
+
+echo "Deploying Karan TrailQuest"
+echo "Namespace : $NAMESPACE"
+echo "Image     : ${IMAGE_REPO}:${IMAGE_TAG}"
 
 kubectl apply -f k8s/namespace.yaml
-
-kubectl create secret generic karan-mongodb-secret   --namespace "$NAMESPACE"   --from-literal=MONGO_URI="$MONGO_URI"   --dry-run=client -o yaml | kubectl apply -f -
-
 kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secret.yml
 kubectl apply -f k8s/app-service.yaml
 
-sed   -e "s|IMAGE_REPOSITORY_PLACEHOLDER|$IMAGE_REPO|g"   -e "s|IMAGE_TAG_PLACEHOLDER|$IMAGE_TAG|g"   k8s/app-deployment.yaml | kubectl apply -f -
+sed \
+  -e "s|IMAGE_REPOSITORY_PLACEHOLDER|${IMAGE_REPO}|g" \
+  -e "s|IMAGE_TAG_PLACEHOLDER|${IMAGE_TAG}|g" \
+  k8s/app-deployment.yaml | kubectl apply -f -
 
-kubectl rollout status deployment/karan-devops-dashboard   -n "$NAMESPACE" --timeout=180s
+kubectl apply -f k8s/ingress.yaml
+kubectl apply -f k8s/hpa.yaml
 
-kubectl get pods -n "$NAMESPACE"
+kubectl rollout status deployment/${DEPLOYMENT_NAME} -n "$NAMESPACE" --timeout=180s
+
+echo
+echo "Pods:"
+kubectl get pods -n "$NAMESPACE" -o wide
+
+echo
+echo "Services:"
 kubectl get svc -n "$NAMESPACE"
+
+echo
+echo "Ingress:"
+kubectl get ingress -n "$NAMESPACE"
+
+echo
+echo "HPA:"
+kubectl get hpa -n "$NAMESPACE"
