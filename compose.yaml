@@ -1,22 +1,13 @@
 services:
-
   app:
-
     build:
       context: .
-
-    image: karan-devops-dashboard:local
-
-    container_name: karan-devops-app
-
+    image: karan1989/karan-trailquest:local
+    container_name: karan-trailquest-app
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: docker-compose
     ports:
       - "5000:5000"
-
-    environment:
-      APP_NAME: Karan DevOps Dashboard
-      APP_VERSION: 3.0.0
-      ENVIRONMENT: docker-compose
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME:-karan_dashboard}
-
     restart: unless-stopped
