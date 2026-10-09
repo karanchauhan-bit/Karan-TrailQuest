@@ -1,27 +1,13 @@
 apiVersion: v1
-
 kind: Service
-
 metadata:
-
-  name: karan-devops-dashboard-service
-
-  namespace: karan-dashboard
-
+  name: karan-trailquest-service
+  namespace: karan-trailquest
 spec:
-
-  type: NodePort
-
+  type: ClusterIP
   selector:
-
-    app: karan-devops-dashboard
-
+    app: karan-trailquest
   ports:
-
     - name: http
-
-      port: 5000
-
-      targetPort: 5000
-
-      nodePort: 30080
+      port: 80
+      targetPort: http
