@@ -14,7 +14,7 @@ COPY . .
 RUN useradd --create-home --uid 10001 trailquest \
     && chown -R trailquest:trailquest /app
 
-USER trailquest
+USER 10001
 
 EXPOSE 5000
 
