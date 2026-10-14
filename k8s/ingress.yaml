@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: trailquest.local
+    - host: trailquest.54.152.101.209.nip.io
       http:
         paths:
           - path: /
