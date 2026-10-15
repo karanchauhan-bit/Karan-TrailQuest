@@ -11,6 +11,7 @@ required_files=(
   k8s/configmap.yaml
   k8s/secret.yml
   k8s/app-service.yaml
+  k8s/servicemonitor.yaml
   k8s/app-deployment.yaml
   k8s/ingress.yaml
   k8s/hpa.yaml
@@ -30,6 +31,12 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yml
 kubectl apply -f k8s/app-service.yaml
+
+if kubectl get crd servicemonitors.monitoring.coreos.com >/dev/null 2>&1; then
+  kubectl apply -f k8s/servicemonitor.yaml
+else
+  echo "INFO: ServiceMonitor CRD not found; skipping Prometheus ServiceMonitor."
+fi
 
 sed \
   -e "s|IMAGE_REPOSITORY_PLACEHOLDER|${IMAGE_REPO}|g" \

@@ -1,12 +1,14 @@
 import os
 import re
 import uuid
+import time
 from datetime import date, datetime, timezone
 
 from dotenv import load_dotenv
-from flask import Flask, current_app, jsonify, render_template, request
+from flask import Flask, current_app, g, jsonify, render_template, request
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 load_dotenv()
 
@@ -29,6 +31,20 @@ TOURS = [
 
 ALLOWED_DESTINATIONS = {tour["name"] for tour in TOURS}
 _mongo_client = None
+
+
+HTTP_REQUESTS = Counter(
+    "trailquest_http_requests_total",
+    "Total HTTP requests received by Karan TrailQuest",
+    ["method", "endpoint", "status_code"],
+)
+
+HTTP_REQUEST_DURATION = Histogram(
+    "trailquest_http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"],
+)
+
 
 def get_database():
     global _mongo_client
@@ -111,6 +127,36 @@ def create_app(test_config=None):
     app.config.update(APP_NAME=APP_NAME, APP_VERSION=APP_VERSION, ENVIRONMENT=ENVIRONMENT)
     if test_config:
         app.config.update(test_config)
+
+    @app.before_request
+    def start_request_timer():
+        g.request_start_time = time.perf_counter()
+
+    @app.after_request
+    def record_request_metrics(response):
+        if request.path != "/metrics":
+            endpoint = request.endpoint or "unknown"
+            duration = time.perf_counter() - g.get("request_start_time", time.perf_counter())
+
+            HTTP_REQUESTS.labels(
+                method=request.method,
+                endpoint=endpoint,
+                status_code=str(response.status_code),
+            ).inc()
+
+            HTTP_REQUEST_DURATION.labels(
+                method=request.method,
+                endpoint=endpoint,
+            ).observe(duration)
+
+        return response
+
+    @app.get("/metrics")
+    def metrics():
+        return app.response_class(
+            generate_latest(),
+            content_type=CONTENT_TYPE_LATEST,
+        )
 
     @app.get("/")
     def index():
