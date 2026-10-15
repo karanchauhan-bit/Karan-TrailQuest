@@ -36,13 +36,13 @@ _mongo_client = None
 HTTP_REQUESTS = Counter(
     "trailquest_http_requests_total",
     "Total HTTP requests received by Karan TrailQuest",
-    ["method", "endpoint", "status_code"],
+    ["method", "route", "status_code"],
 )
 
 HTTP_REQUEST_DURATION = Histogram(
     "trailquest_http_request_duration_seconds",
     "HTTP request duration in seconds",
-    ["method", "endpoint"],
+    ["method", "route"],
 )
 
 
@@ -135,18 +135,18 @@ def create_app(test_config=None):
     @app.after_request
     def record_request_metrics(response):
         if request.path != "/metrics":
-            endpoint = request.endpoint or "unknown"
+            route = request.endpoint or "unknown"
             duration = time.perf_counter() - g.get("request_start_time", time.perf_counter())
 
             HTTP_REQUESTS.labels(
                 method=request.method,
-                endpoint=endpoint,
+                route=route,
                 status_code=str(response.status_code),
             ).inc()
 
             HTTP_REQUEST_DURATION.labels(
                 method=request.method,
-                endpoint=endpoint,
+                route=route,
             ).observe(duration)
 
         return response
