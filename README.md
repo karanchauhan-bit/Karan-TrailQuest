@@ -16,9 +16,12 @@ Customer-facing adventure tour booking application built with Flask, MongoDB Atl
 - MongoDB Atlas booking storage
 - Docker / Docker Compose local workflow
 - Kubernetes Deployment + Service + NGINX Ingress
-- HPA: 2–5 replicas at 60% CPU target
+- HPA: 2–5 replicas at 10% CPU target
 - Readiness and liveness probes
 - Jenkins CI/CD pipeline
+- Prometheus application and Kubernetes monitoring
+- Grafana HPA and application monitoring dashboards
+- ServiceMonitor scraping Flask `/metrics`
 - Real Kubernetes secret excluded from Git
 
 ## Booking data
