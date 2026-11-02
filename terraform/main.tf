@@ -1,11 +1,11 @@
 resource "aws_instance" "trailquest" {
   ami           = "ami-0b6d9d3d33ba97d99"
   instance_type = var.instance_type
-  key_name      = var.key_name
-  subnet_id     = var.subnet_id
+  key_name      = data.aws_key_pair.trailquest.key_name
+  subnet_id     = data.aws_subnet.trailquest.id
 
   vpc_security_group_ids = [
-    var.security_group_id
+    data.aws_security_group.trailquest.id
   ]
 
   root_block_device {
