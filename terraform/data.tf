@@ -9,3 +9,7 @@ data "aws_security_group" "trailquest" {
 data "aws_key_pair" "trailquest" {
   key_name = var.key_name
 }
+
+data "aws_vpc" "trailquest" {
+  id = data.aws_subnet.trailquest.vpc_id
+}
