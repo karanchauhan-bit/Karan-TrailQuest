@@ -18,7 +18,9 @@ resource "aws_instance" "trailquest" {
   }
 
   tags = {
-    Name = "karan-devops-project"
+    Name      = "karan-devops-project"
+    ManagedBy = "Terraform"
+    Project   = "Karan-TrailQuest"
   }
 
   lifecycle {
