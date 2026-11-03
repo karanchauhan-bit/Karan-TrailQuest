@@ -15,3 +15,11 @@ resource "aws_vpc_security_group_ingress_rule" "trailquest_ssh" {
   to_port           = 22
   ip_protocol       = "tcp"
 }
+
+resource "aws_vpc_security_group_ingress_rule" "trailquest_http" {
+  security_group_id = aws_security_group.trailquest.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+}
