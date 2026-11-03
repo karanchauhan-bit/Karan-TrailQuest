@@ -31,3 +31,11 @@ resource "aws_vpc_security_group_ingress_rule" "trailquest_https" {
   to_port           = 443
   ip_protocol       = "tcp"
 }
+
+resource "aws_vpc_security_group_ingress_rule" "trailquest_5050" {
+  security_group_id = aws_security_group.trailquest.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 5050
+  to_port           = 5050
+  ip_protocol       = "tcp"
+}
